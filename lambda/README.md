@@ -7,9 +7,9 @@ This is a barebones demonstration of what is required to develop Lambdas in C#. 
 * The `GenerateRuntimeConfigurationFiles` property is set to `true` in the .csproj file
 * A `LambdaSerializer` is set either for the entire assembly or for each handler invoked by AWS
 
-To publish, simply zip up the file and upload either directly to the Lambda or to an accessible S3 bucket.
+To update the Lambda, publish the project and zip up the output. You can upload either directly to the Lambda or to an accessible S3 bucket and update the Lambda from there using the AWS interface.
 
-If you have [7zip](https://www.7-zip.org/) installed and referenced in your PATH, you can use the following commands:
+If you have [7zip](https://www.7-zip.org/) installed and referenced in your PATH, you can use the following commands to generate the zip file:
 
 ```
 dotnet publish -c Release
