@@ -1,0 +1,202 @@
+{
+  "service": {
+    "service": "lambdademo3-david",
+    "serviceObject": {
+      "name": "lambdademo3-david"
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "dotnetcore3.1",
+      "lambdaHashingVersion": "20201221",
+      "deploymentBucket": "sentinel-serverless-1",
+      "stage": "dev",
+      "region": "us-west-2",
+      "versionFunctions": true,
+      "deploymentBucketObject": {
+        "name": "sentinel-serverless-1"
+      },
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "HelloLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/lambdademo3-david-dev-hello"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "lambdademo3-david",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/lambdademo3-david-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/lambdademo3-david-dev*:*:*"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "lambdademo3-david",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "HelloLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "sentinel-serverless-1",
+                "S3Key": "serverless/lambdademo3-david/dev/1624483427657-2021-06-23T21:23:47.657Z/bin/Release/netcoreapp3.1/hello.zip"
+              },
+              "Handler": "CsharpHandlers::AwsDotnetCsharp.Handler::Hello",
+              "Runtime": "dotnetcore3.1",
+              "FunctionName": "lambdademo3-david-dev-hello",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "HelloLogGroup"
+            ]
+          },
+          "HelloLambdaVersionYXhP77o9Zyio3XJRsncEY5iFl97qPL8U0FRMYNbuLys": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "HelloLambdaFunction"
+              },
+              "CodeSha256": "v6MK09M2+gLNx5hjZYwVzteQVVsGAUqWsIG/adwq15k="
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "sentinel-serverless-1",
+            "Export": {
+              "Name": "sls-lambdademo3-david-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "HelloLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "HelloLambdaVersionYXhP77o9Zyio3XJRsncEY5iFl97qPL8U0FRMYNbuLys"
+            },
+            "Export": {
+              "Name": "sls-lambdademo3-david-dev-HelloLambdaFunctionQualifiedArn"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "pluginsData": {},
+    "functions": {
+      "hello": {
+        "handler": "CsharpHandlers::AwsDotnetCsharp.Handler::Hello",
+        "package": {
+          "artifact": "bin/Release/netcoreapp3.1/hello.zip"
+        },
+        "events": [],
+        "name": "lambdademo3-david-dev-hello",
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "dotnetcore3.1",
+        "vpc": {},
+        "versionLogicalId": "HelloLambdaVersionYXhP77o9Zyio3XJRsncEY5iFl97qPL8U0FRMYNbuLys"
+      }
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless.yml",
+    "initialServerlessConfig": {
+      "service": {
+        "$ref": "$[\"service\"][\"serviceObject\"]"
+      },
+      "frameworkVersion": "2",
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "package": {
+        "individually": true,
+        "deploymentBucket": "sentinel-serverless-1",
+        "artifactDirectoryName": "serverless/lambdademo3-david/dev/1624483427657-2021-06-23T21:23:47.657Z"
+      },
+      "functions": {
+        "$ref": "$[\"service\"][\"functions\"]"
+      }
+    },
+    "layers": {},
+    "isDashboardMonitoringPreconfigured": false
+  },
+  "package": {
+    "individually": true,
+    "artifactDirectoryName": "serverless/lambdademo3-david/dev/1624483427657-2021-06-23T21:23:47.657Z",
+    "artifact": ""
+  }
+}
