@@ -64,3 +64,4 @@ Deployment:
 ```
 dotnet lambda deploy-function
 ```
+This allows us to run custom runtimes, which in this case included .NET 5 (which is otherwise unavailable to Lambdas at the time of this writing).
