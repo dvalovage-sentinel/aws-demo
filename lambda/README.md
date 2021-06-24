@@ -39,3 +39,28 @@ serverless deploy
 ```
 
 Unlike the previous two demos, this Lambda is actually deployed through CloudFormation (infrastructure as code; see [this explanation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html)). This ensures uniform deployment and works well with CI/CD pipelines.
+
+## LambdaDemo4
+This project was created and deployed with the [AWS Serverless Application Model (SAM)](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html). **This is distinct from the Serverless Framework used in LambdaDemo3**.
+
+The commands are similar to Serverless:
+```
+sam build
+sam deploy --guided
+```
+
+There are subtle differences between the two frameworks, however. AWS SAM template syntax is derived from CloudFormation, and Serverless has its own syntax. SAM will be only compatible with AWS, whereas Serverless offers configuration and deployment compatible with other cloud vendors such as Azure, Google, and others.
+
+## LambdaDemo5
+This example illustrates a new possibility with Lambdas: deploying containers to customize the runtime environment.
+
+The code was generated from a [.NET blueprint](https://github.com/aws/aws-lambda-dotnet/tree/master/Blueprints/BlueprintDefinitions/netcore3.1/EmptyFunction-Image/template/src/BlueprintBaseName.1).
+
+New project:
+```
+dotnet new lambda.image.EmptyFunction -n LambdaDemo5
+```
+Deployment:
+```
+dotnet lambda deploy-function
+```
