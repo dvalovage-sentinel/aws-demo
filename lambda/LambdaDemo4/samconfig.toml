@@ -1,0 +1,10 @@
+version = 0.1
+[david]
+[david.deploy]
+[david.deploy.parameters]
+stack_name = "lambdademo4-david"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-15ysqtxn2mp5t"
+s3_prefix = "lambdademo4-david"
+region = "us-west-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
