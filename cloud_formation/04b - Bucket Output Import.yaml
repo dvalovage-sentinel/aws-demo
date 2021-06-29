@@ -1,0 +1,25 @@
+Description: Creates a policy using the imported bucket name
+Resources:
+  BucketPolicyExample:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      # Here we import the exposed bucket name in the previous template.
+      Bucket: !ImportValue SuperSimpleBucketName
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 's3:GetObject'
+            Effect: Allow
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                # Another import.
+                - !ImportValue SuperSimpleBucketName
+                - /*
+            Principal: '*'
+            Condition:
+              StringLike:
+                'aws:Referer':
+                  - 'http://www.example.com/*'
+                  - 'http://example.net/*'

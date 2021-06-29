@@ -1,0 +1,37 @@
+Description: Creates an S3 bucket and attaches a policy based on a conditional parameter
+Parameters:
+  IncludeBucketPolicy:
+    Description: Whether to include the policy for this bucket.
+    Type: String
+    AllowedValues: ['yes','no']
+    Default: 'no'
+Conditions:
+  ShouldCreatePolicy: !Equals ['yes', !Ref IncludeBucketPolicy]
+Resources:
+  BucketExample:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: super-simple-cf-syrup
+  BucketPolicyExample:
+    Type: AWS::S3::BucketPolicy
+    Condition: ShouldCreatePolicy
+    Properties:
+      Bucket: !Ref BucketExample
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 's3:GetObject'
+            Effect: Allow
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref BucketExample
+                - /*
+            Principal: '*'
+            Condition:
+              StringLike:
+                'aws:Referer':
+                  - 'http://www.example.com/*'
+                  - 'http://example.net/*'
+

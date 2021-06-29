@@ -1,0 +1,9 @@
+Description: Creates an S3 bucket
+Resources:
+  # The logical id for a resource ("BucketExample") is given by the programmer.
+  # Must be unique within this section of the template.
+  BucketExample:
+    Type: AWS::S3::Bucket
+    Properties:
+      # The bucket name must be unique across all of AWS.
+      BucketName: super-simple-cf-syrup

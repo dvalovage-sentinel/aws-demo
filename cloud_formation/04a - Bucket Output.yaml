@@ -1,0 +1,16 @@
+Description: Creates an S3 bucket and outputs the name
+Resources:
+  BucketExample:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: super-simple-cf-syrup
+
+# This section defines values to be accessible by other templates.
+# Useful for exposing id's (like ARN) and other values that are 
+# difficult to locate or construct manually.
+Outputs:
+  BucketNameOutput:
+    Description: The name of our example S3 bucket
+    Value: !Ref BucketExample
+    Export:
+      Name: SuperSimpleBucketName

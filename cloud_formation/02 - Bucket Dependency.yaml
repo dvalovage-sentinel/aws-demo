@@ -1,0 +1,35 @@
+Description: Creates an S3 bucket and attaches a policy
+Resources:
+  BucketExample:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: super-simple-cf-syrup
+
+  # New resource that depends on our bucket
+  BucketPolicyExample:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      # The !Ref here is the short form of the reference function,
+      # which returns the bucket name.
+      # See this article for more information: 
+      # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html
+      Bucket: !Ref BucketExample
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 's3:GetObject'
+            Effect: Allow
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                # Our bucket is also referenced here.
+                # Using Ref prevents mistakes if the bucket were renamed.
+                - !Ref BucketExample
+                - /*
+            Principal: '*'
+            Condition:
+              StringLike:
+                'aws:Referer':
+                  - 'http://www.example.com/*'
+                  - 'http://example.net/*'

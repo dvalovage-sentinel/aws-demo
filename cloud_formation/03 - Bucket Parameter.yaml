@@ -1,0 +1,12 @@
+Description: Creates an S3 bucket using a parameter
+# This section defines user input which is referenced below.
+Parameters:
+  BucketName:
+    Description: The name of the bucket provided by the user
+    Type: String
+    AllowedPattern: '^[a-z0-9\\-]+$'
+Resources:
+  BucketExample:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
