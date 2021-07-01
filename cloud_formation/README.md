@@ -11,3 +11,7 @@ Be sure to look up the [resource reference](https://docs.aws.amazon.com/AWSCloud
 As a general rule, sensitive data like passwords or API keys should NOT be used in CloudFormation templates. There are too many ways for the data to be exposed. Some techniques do exist for encrypting parameters or reading sensitive data from AWS SSM, but look for other methods to pass the data first before using CloudFormation templates.
 
 ---
+
+These templates are designed for two purposes:
+* A simple walkthrough for beginners to CloudFormation templates
+* A quick reference for "how to do X"

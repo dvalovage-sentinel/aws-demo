@@ -3,8 +3,14 @@ Parameters:
   IncludeBucketPolicy:
     Description: Whether to include the policy for this bucket.
     Type: String
+    # We're going to match based on this string value of "yes" versus "no".
+    # Note that in YAML, yes/no without the quotes may be interpreted as boolean
+    # and currently would show in the AWS dashboard as true/false.
+    # 
+    # Using quotes here eliminates any ambiguity.
     AllowedValues: ['yes','no']
     Default: 'no'
+# This section defines the condition we'll use on resources in the template.
 Conditions:
   ShouldCreatePolicy: !Equals ['yes', !Ref IncludeBucketPolicy]
 Resources:
@@ -14,6 +20,7 @@ Resources:
       BucketName: super-simple-cf-syrup
   BucketPolicyExample:
     Type: AWS::S3::BucketPolicy
+    # Here is our reference to the conditional input crafted above.
     Condition: ShouldCreatePolicy
     Properties:
       Bucket: !Ref BucketExample

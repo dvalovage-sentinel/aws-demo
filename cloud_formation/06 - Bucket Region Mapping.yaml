@@ -1,0 +1,18 @@
+Description: Creates an S3 bucket with a specialized name using a region mapping
+Mappings:
+  RegionMap:
+    us-east-1: 
+      Suffix: north-virginia
+    us-east-2: 
+      Suffix: ohio
+    us-west-1: 
+      Suffix: north-california
+    us-west-2: 
+      Suffix: oregon
+Resources:
+  BucketExample:
+    Type: AWS::S3::Bucket
+    Properties:
+      # Appends the region-mapped name from above to the bucket.
+      # Example: A stack created in us-west-2 (Oregon) would be named "super-simple-cf-syrup-oregon".
+      BucketName: !Join ['-', [super, simple, cf, syrup, !FindInMap [RegionMap, !Ref 'AWS::Region', Suffix]]]
