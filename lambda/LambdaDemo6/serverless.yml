@@ -8,6 +8,10 @@ provider:
   stage: dev
   region: us-west-2
 
+  # This is supposed to work with APIGatewayHttpApiV2ProxyFunction, but doesn't seem to
+  httpApi:
+    payload: '2.0'
+
 package:
   individually: true
 
