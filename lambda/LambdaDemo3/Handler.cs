@@ -1,13 +1,23 @@
+using System.Threading.Tasks;
 using Amazon.Lambda.Core;
+using Amazon.S3;
+using Amazon.S3.Model;
 
 [assembly:LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 namespace AwsDotnetCsharp
 {
     public class Handler
     {
-       public Response Hello(Request request)
+       public async Task<Response> Hello(Request request)
        {
-           return new Response("Go Serverless v1.0! Your function executed successfully!", request);
+         var s3Client = new AmazonS3Client();
+         var s3Request = new ListObjectsV2Request
+         {
+           BucketName = "sentinel-serverless-demo1"
+         };
+
+         var list = await s3Client.ListObjectsV2Async(s3Request);
+         return new Response($"Number  of files in the bucket: {list.S3Objects.Count}", request);
        }
     }
 

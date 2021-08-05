@@ -3,3 +3,5 @@ obj/
 .vs/
 .aws-sam/
 .serverless/
+node_modules/
+package-lock.json
