@@ -1,0 +1,20 @@
+service: LambdaDemo6 
+provider:
+  name: aws
+  runtime: dotnetcore3.1
+  lambdaHashingVersion: 20201221
+  deploymentBucket:
+    name: sentinel-serverless-1
+  stage: dev
+  region: us-west-2
+
+package:
+  individually: true
+
+functions:
+  hello:
+    handler: 'LambdaDemo6::MySpace.LambdaEntryPoint::FunctionHandlerAsync'
+    package:
+      artifact: bin/release/netcoreapp3.1/hello.zip
+    events:
+      - http: ANY /{proxy+}
