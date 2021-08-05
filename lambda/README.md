@@ -65,3 +65,20 @@ Deployment:
 dotnet lambda deploy-function
 ```
 This allows us to run custom runtimes, which in this case included .NET 5 (which is otherwise unavailable to Lambdas at the time of this writing).
+
+## LambdaDemo6
+This example shows how to implement ASP<area>.NET Core Serverless into a Serverless (.com) project.
+
+The principal differences from previous demos with Serverless are:
+
+1. Adding the package reference for ASP<area>.NET Core Server into the csproj file:
+        
+        <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="6.0.3" />
+
+1. The `LambdaEntryPoint` class inherits from `APIGatewayHttpApiV2ProxyFunction` to integrate with the AWS HTTP API.
+1. The Serverless template uses HTTP API in its mark up (denoted as `httpApi` under the event).
+1. The requisite `Startup` and Controller classes must be included and registered properly using ASP<area>.NET Core wiring.
+
+Using this setup with a wildcard mapping for the HTTP API pushes all routing back to the Lambda, which handles request marshalling internally.
+
+The older AWS REST API can still be used with the `http` event tag in the Serverless template. However a different base class in the entry point must be used in conjunction with this or a null reference will be thrown. See `LambdaEntryPoint.cs` for further explanation.

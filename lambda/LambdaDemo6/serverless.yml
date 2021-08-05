@@ -8,12 +8,11 @@ provider:
   stage: dev
   region: us-west-2
 
-  # This is supposed to work with APIGatewayHttpApiV2ProxyFunction, but doesn't seem to
+  # Specifies the version of the HTTP API payload sent to the Lambda.
+  # If the REST API is required, remove this and specify 'http' 
+  # instead of 'httpApi' for the events below.
   httpApi:
     payload: '2.0'
-
-package:
-  individually: true
 
 functions:
   hello:
@@ -21,4 +20,5 @@ functions:
     package:
       artifact: bin/release/netcoreapp3.1/hello.zip
     events:
-      - http: ANY /{proxy+}
+      # This will construct an HTTP API endpoint to integrate with the Lambda.
+      - httpApi: '*'
