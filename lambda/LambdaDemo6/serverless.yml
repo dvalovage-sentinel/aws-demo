@@ -14,6 +14,9 @@ provider:
   httpApi:
     payload: '2.0'
 
+package: 
+  individually: true
+
 functions:
   hello:
     handler: 'LambdaDemo6::MySpace.LambdaEntryPoint::FunctionHandlerAsync'

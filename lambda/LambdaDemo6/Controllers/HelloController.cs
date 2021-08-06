@@ -5,9 +5,9 @@ using System;
 public class HelloController : ControllerBase
 {
     [HttpGet, Route("hello")]
-    public IActionResult GetHello()
+    public IActionResult GetHello([FromQuery] string name)
     {
-        return Ok("You got hello!");
+        return Ok($"Hello {name}!");
     }
 
     [HttpGet, Route("hello2")]
