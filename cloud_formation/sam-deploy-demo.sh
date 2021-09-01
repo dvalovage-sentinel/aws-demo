@@ -6,10 +6,8 @@
 # These variables should be adjusted to your AWS account
 # You'll need to create the DEPLOY_BUCKET to upload the CF template file
 DEPLOY_BUCKET='my-deployment-bucket'
-REGION='us-west-2'
-
-# This must be a unique name across AWS, or the deployment will fail!
 NEW_BUCKET_NAME='new-bucket-12345potato'
+REGION='us-west-2'
 
 deploy () 
 {
