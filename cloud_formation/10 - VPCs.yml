@@ -1,0 +1,113 @@
+Description: Creates a VPC and sample subnets
+
+Parameters:
+  Environment:
+    Type: String
+    # AllowedValues: [dev,qa,prod]
+
+Outputs:
+  Vpc1Id:
+    Description: The VpcId for VPC1
+    Value: !Ref VPC1
+    Export:
+      Name: !Sub ${Environment}-Vpc1-Id
+  SubnetAId:
+    Description: The SubnetId for SubnetA
+    Value: !Ref SubnetAPrivate
+    Export:
+      Name: !Sub ${Environment}-SubnetA-Id
+  SubnetBId:
+    Description: The SubnetId for SubnetB
+    Value: !Ref SubnetBPrivate
+    Export:
+      Name: !Sub ${Environment}-SubnetB-Id
+
+Resources:
+  VPC1:
+    Type: AWS::EC2::VPC
+    DeletionPolicy: Delete
+    Properties:
+      CidrBlock: '10.0.0.0/16'
+
+  SubnetAPrivate:
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Delete
+    Properties:
+      VpcId: !Ref VPC1
+      CidrBlock: '10.0.0.0/24'
+
+  SubnetARouteTable:
+    Type: AWS::EC2::RouteTable
+    DeletionPolicy: Delete
+    Properties:
+      VpcId: !Ref VPC1
+
+  SubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DeletionPolicy: Delete
+    Properties: 
+      RouteTableId: !Ref SubnetARouteTable
+      SubnetId: !Ref SubnetAPrivate
+
+  SubnetBPrivate:
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Delete
+    Properties:
+      VpcId: !Ref VPC1
+      CidrBlock: '10.0.1.0/24'
+      AvailabilityZone: !Select [1, !GetAZs '']
+
+  SubnetBRouteTable:
+    Type: AWS::EC2::RouteTable
+    DeletionPolicy: Delete
+    Properties:
+      VpcId: !Ref VPC1
+
+  SubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    DeletionPolicy: Delete
+    Properties: 
+      RouteTableId: !Ref SubnetBRouteTable
+      SubnetId: !Ref SubnetBPrivate
+
+  NetworkAclPrivate:
+    Type: AWS::EC2::NetworkAcl
+    DeletionPolicy: Delete
+    Properties:
+      VpcId: !Ref VPC1
+      
+  SubnetNetworkAclAssociationAPrivate:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    DeletionPolicy: Delete
+    Properties:
+      SubnetId: !Ref SubnetAPrivate
+      NetworkAclId: !Ref NetworkAclPrivate
+      
+  SubnetNetworkAclAssociationBPrivate:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    DeletionPolicy: Delete
+    Properties:
+      SubnetId: !Ref SubnetBPrivate
+      NetworkAclId: !Ref NetworkAclPrivate
+      
+  NetworkAclEntryInPrivateAllowVPC:
+    Type: AWS::EC2::NetworkAclEntry
+    DeletionPolicy: Delete
+    Properties:
+      NetworkAclId: !Ref NetworkAclPrivate
+      RuleNumber: 99
+      Protocol: -1
+      RuleAction: allow
+      Egress: false
+      CidrBlock: '0.0.0.0/0'
+      
+  NetworkAclEntryOutPrivateAllowVPC:
+    Type: AWS::EC2::NetworkAclEntry
+    DeletionPolicy: Delete
+    Properties:
+      NetworkAclId: !Ref NetworkAclPrivate
+      RuleNumber: 99
+      Protocol: -1
+      RuleAction: allow
+      Egress: true
+      CidrBlock: '0.0.0.0/0'

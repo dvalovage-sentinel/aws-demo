@@ -1,0 +1,92 @@
+Description: Creates a sample Aurora PostgreSQL RDS database using VPC1
+
+Parameters:
+  Environment:
+    Type: String
+    # AllowedValues: [dev,qa,prod]
+
+Outputs:
+  DbSecretArn:
+    Description: The ARN for the master db secret
+    Value: !Ref ClusterSecret
+    Export:
+      Name: !Sub ${Environment}-RDS-ClusterSecret-ARN
+  DbClusterAddress:
+    Description: The primary endpoint for the db cluster
+    Value: !GetAtt AuroraDBCluster.Endpoint.Address
+    Export:
+      Name: !Sub ${Environment}-RDS-DbCluster-Address
+
+Resources:
+  RDSClusterLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: !Sub /aws/rds/cluster/${Environment}-cluster/postgresql
+
+  DbSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    DeletionPolicy: Delete
+    Properties:
+      DBSubnetGroupDescription: !Sub ${Environment}-DbSubnetGroup1
+      DBSubnetGroupName: !Sub ${Environment}-dbsubnetgroup1
+      SubnetIds: 
+        - Fn::ImportValue:
+            !Sub ${Environment}-SubnetA-Id
+        - Fn::ImportValue:
+            !Sub ${Environment}-SubnetB-Id
+  
+  DbClusterSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    DeletionPolicy: Delete
+    Properties:
+      GroupDescription: !Ref 'AWS::StackName'
+      VpcId: 
+        Fn::ImportValue:
+          !Sub ${Environment}-Vpc1-Id
+
+  DbSGIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    DeletionPolicy: Delete
+    Properties: 
+      Description: RDS port ingress Self Reference
+      FromPort: '5432'
+      GroupId: !Ref DbClusterSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId: !Ref DbClusterSecurityGroup
+      ToPort: '5432'
+
+  ClusterSecret:
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Delete
+    Properties:
+      Name: !Sub ${Environment}-AuroraClusterSecret
+      Description: 'This is the Master secret for the RDS Aurora cluster'
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "demo"}'
+        GenerateStringKey: 'password'
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
+
+  SecretRDSInstanceAttachment:
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    DeletionPolicy: Delete
+    Properties:
+      SecretId: !Ref ClusterSecret
+      TargetId: !Ref AuroraDBCluster
+      TargetType: AWS::RDS::DBCluster
+
+  AuroraDBCluster:
+    Type: AWS::RDS::DBCluster
+    DeletionPolicy: Delete
+    Properties:
+      DBClusterIdentifier: !Sub ${Environment}-DbCluster
+      Engine: aurora-postgresql
+      EngineMode: serverless
+      EngineVersion: '10.12'
+      EnableHttpEndpoint: true
+      MasterUsername: !Sub '{{resolve:secretsmanager:${ClusterSecret}:SecretString:username}}'
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${ClusterSecret}:SecretString:password}}'
+      DBSubnetGroupName: !Sub ${Environment}-dbsubnetgroup1
+      VpcSecurityGroupIds:
+      - !Ref DbClusterSecurityGroup 

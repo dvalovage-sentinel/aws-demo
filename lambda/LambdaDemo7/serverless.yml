@@ -1,0 +1,34 @@
+service: LambdaDemo7
+frameworkVersion: '2'
+package:
+  individually: true
+
+provider:
+  name: aws
+  runtime: dotnetcore3.1
+  lambdaHashingVersion: 20201221
+  deploymentBucket:
+    name: sentinel-serverless-${sls:stage}
+  region: us-west-2
+
+functions:
+  run:
+    handler: LambdaDemo7::EntryPoint.Handler::Run
+    package:
+      artifact: bin/Release/netcoreapp3.1/hello.zip
+    name: ${sls:stage}-DBMigration
+    description: Executes DB Schema Migrations.
+    memorySize: 512
+    timeout: 100
+    role: DBMigrationRole
+    environment:
+      DB_CLUSTER_ADDRESS:
+        Fn::ImportValue:
+          ${sls:stage}-RDS-DbCluster-Address
+      DB_SECRET_ARN:
+        Fn::ImportValue: 
+          ${sls:stage}-RDS-ClusterSecret-ARN
+      DB_NAME: 'rds_demo_db'
+
+resources:
+  - ${file(CF/DBMigrationRole.yml)}
