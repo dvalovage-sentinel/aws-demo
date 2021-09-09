@@ -25,7 +25,7 @@ deploy ()
 }
 
 # Pass the template name (source) and the target stack name without the environment here (destination)
-deploy "03 - Bucket Parameter.yaml" 'AWS-SAM-Deployment-demo'
+deploy "03 - Bucket Parameter.yml" 'AWS-SAM-Deployment-demo'
 
 # More deploy commands could be issued here
 
