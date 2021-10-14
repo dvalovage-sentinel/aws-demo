@@ -28,6 +28,8 @@ Resources:
     DeletionPolicy: Delete
     Properties:
       CidrBlock: '10.0.0.0/16'
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
 
   SubnetAPrivate:
     Type: AWS::EC2::Subnet
@@ -35,6 +37,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC1
       CidrBlock: '10.0.0.0/24'
+      AvailabilityZone: !Select [0, !GetAZs '']
 
   SubnetARouteTable:
     Type: AWS::EC2::RouteTable
