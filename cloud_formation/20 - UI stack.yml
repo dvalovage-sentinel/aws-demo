@@ -1,0 +1,97 @@
+Description: S3 buckets for monitoring services
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues: [dev,qa,prod,david,eduardo]
+
+Mappings:
+  EnvironmentMap:
+    dev:
+      # Fill these in with the ARN's from matching public certs in the us-east-1 region
+      UsEast1AcmCertArn: ''
+    qa:
+      UsEast1AcmCertArn: ''
+    prod:
+      UsEast1AcmCertArn: ''
+
+Resources:
+  BackboneOrderUIBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Sub ${Environment}-backbone-order-ui
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+
+  BackboneOrderUIBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: Delete
+    Properties:
+      Bucket: !Ref BackboneOrderUIBucket
+      PolicyDocument: !Sub |
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "s3:GetObject"
+                    ],
+                    "Principal": "*",
+                    "Resource": "arn:aws:s3:::${BackboneOrderUIBucket}/*"
+                }
+            ]
+        }
+
+  BackboneOrderUICloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    DeletionPolicy: Delete
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Sub order.${Environment}.cloud.sentineldna.com
+        Origins:
+          - DomainName: !GetAtt BackboneOrderUIBucket.DomainName
+            Id: !Sub ${Environment}-order-ui
+            S3OriginConfig: {}
+        PriceClass: PriceClass_100
+        Enabled: true
+        IPV6Enabled: true
+        HttpVersion: http2
+        CacheBehaviors: []
+        DefaultCacheBehavior:
+          # CachingOptimized
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          TargetOriginId: !Sub ${Environment}-order-ui
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: index.html
+        ViewerCertificate:
+          AcmCertificateArn: !FindInMap [EnvironmentMap, !Ref Environment, UsEast1AcmCertArn]
+          MinimumProtocolVersion: TLSv1.2_2021
+          SslSupportMethod: sni-only
+
+  OrderUIRecordSetTypeA:
+    Type: AWS::Route53::RecordSet
+    DeletionPolicy: Delete
+    Properties:
+      HostedZoneName: !Sub ${Environment}.cloud.sentineldna.com.
+      Name: !Sub order.${Environment}.cloud.sentineldna.com.
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt BackboneOrderUICloudFrontDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+  OrderUIRecordSetTypeAAAA:
+    Type: AWS::Route53::RecordSet
+    DeletionPolicy: Delete
+    Properties:
+      HostedZoneName: !Sub ${Environment}.cloud.sentineldna.com.
+      Name: !Sub order.${Environment}.cloud.sentineldna.com.
+      Type: AAAA
+      AliasTarget:
+        DNSName: !GetAtt BackboneOrderUICloudFrontDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+
